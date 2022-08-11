@@ -1,6 +1,7 @@
+#![allow(dead_code)]
+
 use rand::prelude::SliceRandom;
 
-#[allow(dead_code)]
 enum GameCommand {
     JumpCommand,
     FireCommand,
@@ -9,8 +10,6 @@ enum GameCommand {
 }
 
 struct Actor {}
-
-#[allow(dead_code)]
 impl Actor {
     fn new() -> Actor {
         Actor {}
@@ -144,7 +143,6 @@ struct CommandManager<T: BaseCommand> {
 }
 
 impl<T: BaseCommand> CommandManager<T> {
-    #[allow(dead_code)]
     fn new() -> Self {
         CommandManager {
             pos: Position { x: 0, y: 0 },
@@ -152,13 +150,11 @@ impl<T: BaseCommand> CommandManager<T> {
         }
     }
 
-    #[allow(dead_code)]
     fn execute(&mut self, command: &mut T) {
         command.execute(&mut self.pos);
         self.commands_history.push(command.clone());
     }
 
-    #[allow(dead_code)]
     fn undo(&mut self) {
         let command = self.commands_history.pop();
         if let Some(command) = command {
