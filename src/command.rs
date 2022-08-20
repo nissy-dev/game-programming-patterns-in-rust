@@ -10,6 +10,7 @@ enum GameCommand {
 }
 
 struct Actor {}
+
 impl Actor {
     fn new() -> Actor {
         Actor {}
