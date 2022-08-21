@@ -25,7 +25,7 @@ mod tests {
     #[test]
     fn prototype_test() {
         let prototype = ConcretePrototype::new(10);
-        println!("originnal: {:?}", prototype);
+        println!("original: {:?}", prototype);
         let _cloned = prototype.clone();
         println!("cloned: {:?}", prototype);
     }
