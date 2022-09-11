@@ -1,16 +1,20 @@
 // see: https://gist.github.com/matthewjberger/082ec2caccc67d68d63794949e350d9b
+// see: https://gist.github.com/RyuuGan/44c565cb59cd984d3fcde70010ed9591
+// The difference is Box/RC/RefCell: https://doc.rust-jp.rs/book-ja/ch15-05-interior-mutability.html
+// this implementation is not thread safe
 #![allow(dead_code)]
+
+use std::rc::Rc;
 
 enum Event {
     A,
     B,
 }
 
-trait IObserver: PartialEq {
+trait IObserver {
     fn on_notify(&self, event: &Event);
 }
 
-#[derive(PartialEq)]
 struct Observer {}
 
 impl IObserver for Observer {
@@ -22,17 +26,17 @@ impl IObserver for Observer {
     }
 }
 
-struct Subject<'a, T: IObserver> {
-    observers: Vec<&'a T>,
+struct Subject {
+    observers: Vec<Rc<dyn IObserver>>,
 }
 
-trait ISubject<'a, T: IObserver> {
-    fn add_observer(&mut self, observer: &'a T);
-    fn remove_observer(&mut self, observer: &'a T);
+trait ISubject {
+    fn add_observer(&mut self, observer: Rc<dyn IObserver>);
+    fn remove_observer(&mut self, observer: Rc<dyn IObserver>);
     fn notify(&self, event: &Event);
 }
 
-impl<'a, T: IObserver> Subject<'a, T> {
+impl Subject {
     fn new() -> Self {
         Subject {
             observers: Vec::new(),
@@ -40,13 +44,13 @@ impl<'a, T: IObserver> Subject<'a, T> {
     }
 }
 
-impl<'a, T: IObserver> ISubject<'a, T> for Subject<'a, T> {
-    fn add_observer(&mut self, observer: &'a T) {
+impl ISubject for Subject {
+    fn add_observer(&mut self, observer: Rc<dyn IObserver>) {
         self.observers.push(observer);
     }
 
-    fn remove_observer(&mut self, observer: &'a T) {
-        self.observers.retain(|o| *o != observer);
+    fn remove_observer(&mut self, observer: Rc<dyn IObserver>) {
+        self.observers.retain(|o| !Rc::ptr_eq(o, &observer));
     }
 
     fn notify(&self, event: &Event) {
@@ -62,9 +66,12 @@ mod tests {
 
     #[test]
     fn observer_test() {
-        let observer = Observer {};
+        let observer = Rc::new(Observer {});
         let mut subject = Subject::new();
-        subject.add_observer(&observer);
+        subject.add_observer(observer.clone());
+        assert!(subject.observers.len() == 1);
         subject.notify(&Event::A);
+        subject.remove_observer(observer.clone());
+        assert!(subject.observers.len() == 0);
     }
 }
