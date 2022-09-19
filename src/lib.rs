@@ -7,3 +7,4 @@ mod observer;
 mod prototype;
 mod singleton;
 mod state;
+mod subclass_sandbox;
