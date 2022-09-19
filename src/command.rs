@@ -169,7 +169,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn game_test() {
+    fn command_1() {
         let handler = GameInputHandler {
             buttonX_: GameCommand::JumpCommand,
             buttonY_: GameCommand::FireCommand,
@@ -183,7 +183,7 @@ mod tests {
     }
 
     #[test]
-    fn move_test() {
+    fn command_2() {
         let mut manager = CommandManager::new();
 
         let mut command_a = MoveCommand::new(1, 1);

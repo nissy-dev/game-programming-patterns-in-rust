@@ -23,7 +23,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn prototype_test() {
+    fn prototype() {
         let prototype = ConcretePrototype::new(10);
         println!("original: {:?}", prototype);
         let _cloned = prototype.clone();

@@ -65,7 +65,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn observer_test() {
+    fn observer() {
         let observer = Rc::new(Observer {});
         let mut subject = Subject::new();
         subject.add_observer(observer.clone());

@@ -66,7 +66,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn world_test() {
+    fn flyweight_enum() {
         let mut world = World::new();
         world.generate_terrains();
         let tile = world.get_tile(1, 1);

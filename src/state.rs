@@ -70,7 +70,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn state_test() {
+    fn state() {
         let mut heroine = Heroine::new();
         // heroine is standing
         println!("heroine: {:?}", heroine.state);

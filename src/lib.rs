@@ -1,4 +1,6 @@
+mod bytecode;
 mod command;
+mod double_buffer;
 mod flyweight;
 mod flyweight_enum;
 mod observer;

@@ -25,7 +25,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn singleton_test() {
+    fn singleton() {
         let f1 = Config::get_instance();
         println!("f1: {:?}", f1);
 
