@@ -1,12 +1,11 @@
 mod bytecode;
 mod command;
 mod component;
-mod data_locality;
-mod dirty_flag;
 mod double_buffer;
 mod event_queue;
 mod flyweight;
 mod flyweight_enum;
+mod object_pool;
 mod observer;
 mod prototype;
 mod service_locator;
