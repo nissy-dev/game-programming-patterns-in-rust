@@ -79,7 +79,7 @@ struct Particle {
     y: u32,
     x_vel: u32,
     y_vel: u32,
-    next: Option<Box<Particle>>,
+    next: Option<usize>,
 }
 
 impl Particle {
@@ -102,60 +102,86 @@ impl Particle {
         self.y_vel = y_vel;
     }
 
-    fn animate(&mut self) {
+    fn animate(&mut self) -> bool {
         if !self.is_use() {
-            return;
+            return false;
         }
 
         self.x += self.x_vel;
         self.y += self.y_vel;
         self.frame_left -= 1;
+        return self.frame_left == 0;
     }
 
     fn is_use(&self) -> bool {
         self.frame_left > 0
     }
 
-    fn get_next(&mut self) -> Option<Box<Particle>> {
-        self.next.take()
+    fn get_next_id(&mut self) -> Option<usize> {
+        self.next
     }
 
-    fn set_next(&mut self, particle: Box<Particle>) {
-        self.next = Some(particle);
+    fn set_next_id(&mut self, id: usize) {
+        self.next = Some(id);
     }
 }
 
+#[derive(Debug, Clone)]
 struct ParticlePool {
-    head: Option<Box<Particle>>,
+    head_id: Option<usize>,
+    particles: Vec<Particle>,
 }
 
 impl ParticlePool {
     fn new() -> Self {
-        let mut particle = Box::new(Particle::new());
-        for _ in 0..PARTICLE_SIZE - 1 {
-            let mut new_particle = Box::new(Particle::new());
-            new_particle.set_next(particle);
-            particle = new_particle;
+        let mut particles = Vec::with_capacity(PARTICLE_SIZE);
+        for _ in 0..PARTICLE_SIZE {
+            particles.push(Particle::new());
+        }
+
+        for i in 0..PARTICLE_SIZE - 1 {
+            particles[i].set_next_id(i + 1);
         }
 
         ParticlePool {
-            head: Some(particle),
+            head_id: Some(0),
+            particles,
         }
     }
 
     fn animate(&mut self) {
-        while let Some(particle) = &mut self.head {
-            particle.animate();
-            self.head = particle.get_next();
+        for i in 0..PARTICLE_SIZE {
+            if self.particles[i].animate() {
+                self.particles[i].set_next_id(self.head_id.unwrap());
+                self.head_id = Some(i);
+            }
         }
     }
 
     fn create(&mut self, x: u32, y: u32, x_vel: u32, y_vel: u32, lifetime: u32) {
-        if let Some(particle) = &mut self.head {
-            self.head = particle.get_next();
-            if let Some(particle) = &mut self.head {
-                particle.init(x, y, x_vel, y_vel, lifetime);
+        if let Some(id) = self.head_id {
+            self.head_id = self.particles[id].get_next_id();
+            if let Some(new_id) = self.head_id {
+                self.particles[new_id].init(x, y, x_vel, y_vel, lifetime);
             }
         }
+    }
+
+    fn get_particle(&self) -> &Particle {
+        &self.particles[self.head_id.unwrap()]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn object_pool() {
+        let mut pool = ParticlePool::new();
+        pool.create(0, 0, 1, 1, 10);
+        assert_eq!(pool.get_particle().frame_left, 10);
+        pool.animate();
+        assert_eq!(pool.get_particle().frame_left, 9);
     }
 }
